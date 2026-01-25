@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}{{ property.number }} - TechnikNet{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-building"></i> Property Details</h2>
+    <div>
+        <a href="{% url 'property_list' %}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back
+        </a>
+        <a href="{% url 'property_user_edit' property.pk %}" class="btn btn-warning">
+            <i class="bi bi-pencil"></i> Edit User Fields
+        </a>
+        {% if user.is_superuser %}
+        <a href="{% url 'property_admin_edit' property.pk %}" class="btn btn-primary">
+            <i class="bi bi-shield-lock"></i> Edit Admin Fields
+        </a>
+        <a href="{% url 'property_delete' property.pk %}" class="btn btn-danger">
+            <i class="bi bi-trash"></i> Delete
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- Admin Fields -->
+        <div class="card mb-3">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-shield-lock"></i> Admin Fields</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr><th>Number:</th><td>{{ property.number }}</td></tr>
+                    <tr><th>Region:</th><td>{{ property.region }}</td></tr>
+                    {% if user.is_superuser %}<tr><th>Address ID:</th><td>{{ property.address_id }}</td></tr>{% endif %}
+                    <tr><th>Village:</th><td>{{ property.village }}</td></tr>
+                    <tr><th>Street:</th><td>{{ property.street }}</td></tr>
+                    <tr><th>House Number:</th><td>{{ property.house_number }} {{ property.house_number_affix }}</td></tr>
+                    <tr><th>Owner Name:</th><td>{{ property.owner_name }} {{ property.owner_surname }}</td></tr>
+                    <tr><th>Owner Email:</th><td>{{ property.owner_email }}</td></tr>
+                    <tr><th>Owner Phone:</th><td>{{ property.owner_phone_1 }} / {{ property.owner_phone_2 }}</td></tr>
+                    <tr><th>PoP Code:</th><td>{{ property.pop_code }}</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- User Fields -->
+        <div class="card mb-3">
+            <div class="card-header bg-warning">
+                <h5 class="mb-0"><i class="bi bi-pencil"></i> User Fields</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <tr><th>Gebaute Units:</th><td>{{ property.gebaute_units|default:"-" }}</td></tr>
+                    <tr><th>HBG:</th><td>{{ property.hbg|default:"-" }}</td></tr>
+                    <tr><th>HBG Termin:</th><td>{% if property.hbg_termin %}{{ property.hbg_termin|date:"Y-m-d H:i" }}{% else %}-{% endif %}</td></tr>
+                    <tr><th>Ausbau Termin:</th><td>{% if property.ausbau_termin %}{{ property.ausbau_termin|date:"Y-m-d H:i" }}{% else %}-{% endif %}</td></tr>
+                    <tr><th>K.L 15M:</th><td>{{ property.kl_15m|default:"-" }}</td></tr>
+                    <tr><th>K.L 20M:</th><td>{{ property.kl_20m|default:"-" }}</td></tr>
+                    <tr><th>K.L 30M:</th><td>{{ property.kl_30m|default:"-" }}</td></tr>
+                    <tr><th>K.L 50M:</th><td>{{ property.kl_50m|default:"-" }}</td></tr>
+                    <tr><th>K.L 80M:</th><td>{{ property.kl_80m|default:"-" }}</td></tr>
+                    <tr><th>K.L 100M:</th><td>{{ property.kl_100m|default:"-" }}</td></tr>
+                    <tr><th>Keller:</th><td>{{ property.keller|default:"-" }}</td></tr>
+                    <tr><th>HÜP:</th><td>{{ property.huep|default:"-" }}</td></tr>
+                    <tr><th>Spleissen:</th><td>{{ property.spleissen|default:"-" }}</td></tr>
+                    <tr><th>Ohne Infra:</th><td>{{ property.ohne_infra|default:0 }}</td></tr>
+		    <tr><th>Mit Infra:</th><td>{{ property.mit_infra|default:0 }}</td></tr>
+                    {% if user.is_superuser %}
+                    <tr>
+                        <th>Netop:</th>
+                        <td><span class="badge bg-warning text-dark">{{ property.netop|default:"-" }}</span></td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <th>Status:</th>
+                        <td>
+                            {% if property.status %}
+                                <span class="badge
+                                    {% if property.status == 'klarungen' %}bg-warning text-dark
+                                    {% elif property.status == 'auskundung' %}bg-warning
+                                    {% elif property.status == 'ausbau_terminiert' %}bg-primary
+                                    {% elif property.status == 'ausbau_abgeschlossen' %}bg-success
+                                    {% else %}bg-info
+                                    {% endif %}">
+                                    {{ property.get_status_display }}
+                                </span>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Images -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-images"></i> Images</h5>
+            </div>
+            <div class="card-body">
+                {% if images %}
+                {% for image in images %}
+                <div class="mb-3">
+                    <img src="{{ image.image.url }}" class="img-fluid property-image mb-2" alt="Property">
+                    <form method="post" action="{% url 'image_delete' image.pk %}" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Delete this image?')">
+                            <i class="bi bi-trash"></i> Delete
+                        </button>
+                    </form>
+                    <small class="text-muted d-block">{{ image.uploaded_at|date:"Y-m-d H:i" }}</small>
+                </div>
+                {% endfor %}
+                {% else %}
+                <p class="text-muted">No images uploaded</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

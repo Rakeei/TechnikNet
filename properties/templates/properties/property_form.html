@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}
+{% if mode == 'create' %}Create Property{% else %}Edit Property{% endif %} - TechnikNet
+{% endblock %}
+
+{% block content %}
+<h2>
+    {% if mode == 'create' %}
+    <i class="bi bi-plus-circle"></i> Create New Property
+    {% else %}
+    <i class="bi bi-pencil"></i> Edit Admin Fields
+    {% endif %}
+</h2>
+
+<form method="post" enctype="multipart/form-data" class="mt-4">
+    {% csrf_token %}
+
+    <div class="card mb-3">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Admin Fields</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label for="region" class="form-label">Region *</label>
+                    <select name="region" id="region" class="form-select" required>
+                        {% for region in regions %}
+                        <option value="{{ region.code }}" {% if property.region.code == region.code %}selected{% endif %}>
+                            {{ region.code }} - {{ region.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="number" class="form-label">Number *</label>
+                    <input type="text" name="number" id="number" class="form-control" value="{{ property.number }}" required>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="address_id" class="form-label">Address ID</label>
+                    <input type="text" name="address_id" id="address_id" class="form-control" value="{{ property.address_id }}">
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="village" class="form-label">Village</label>
+                    <input type="text" name="village" id="village" class="form-control" value="{{ property.village }}">
+                </div>
+                <div class="col-md-8 mb-3">
+                    <label for="street" class="form-label">Street</label>
+                    <input type="text" name="street" id="street" class="form-control" value="{{ property.street }}">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="house_number" class="form-label">House #</label>
+                    <input type="text" name="house_number" id="house_number" class="form-control" value="{{ property.house_number }}">
+                </div>
+                <div class="col-md-2 mb-3">
+                    <label for="house_number_affix" class="form-label">Affix</label>
+                    <input type="text" name="house_number_affix" id="house_number_affix" class="form-control" value="{{ property.house_number_affix }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="owner_name" class="form-label">Owner Name</label>
+                    <input type="text" name="owner_name" id="owner_name" class="form-control" value="{{ property.owner_name }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="owner_surname" class="form-label">Owner Surname</label>
+                    <input type="text" name="owner_surname" id="owner_surname" class="form-control" value="{{ property.owner_surname }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="owner_email" class="form-label">Owner Email</label>
+                    <input type="email" name="owner_email" id="owner_email" class="form-control" value="{{ property.owner_email }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="owner_phone_1" class="form-label">Phone 1</label>
+                    <input type="text" name="owner_phone_1" id="owner_phone_1" class="form-control" value="{{ property.owner_phone_1 }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="owner_phone_2" class="form-label">Phone 2</label>
+                    <input type="text" name="owner_phone_2" id="owner_phone_2" class="form-control" value="{{ property.owner_phone_2 }}">
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label for="pop_code" class="form-label">PoP Code</label>
+                    <input type="text" name="pop_code" id="pop_code" class="form-control" value="{{ property.pop_code }}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-circle"></i> Save
+        </button>
+        <a href="{% if property %}{% url 'property_detail' property.pk %}{% else %}{% url 'property_list' %}{% endif %}" class="btn btn-secondary">
+            <i class="bi bi-x-circle"></i> Cancel
+        </a>
+    </div>
+</form>
+{% endblock %}

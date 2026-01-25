@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Images - {{ property.number }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-images"></i> Upload Images</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Property:</strong> {{ property.number }} - {{ property.village }}</p>
+                <hr>
+             <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="mb-3">
+        <label for="images" class="form-label">Select Images or Use Camera</label>
+        <input type="file" name="images" id="images" class="form-control mb-2" multiple accept="image/*" capture="environment">
+        <small class="form-text text-muted">
+            📸 On mobile devices, you can use your camera directly<br>
+            🖼️ Or select multiple images from gallery
+        </small>
+    </div>
+
+    <!-- Preview area -->
+    <div id="preview" class="mb-3"></div>
+
+    <div class="d-flex gap-2">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-upload"></i> Upload
+        </button>
+        <a href="{% url 'property_list' %}" class="btn btn-secondary">
+            <i class="bi bi-x-circle"></i> Cancel
+        </a>
+    </div>
+</form>
+
+<script>
+document.getElementById('images').addEventListener('change', function(e) {
+    const preview = document.getElementById('preview');
+    preview.innerHTML = '';
+
+    Array.from(e.target.files).forEach(file => {
+        if (file.type.startsWith('image/')) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'img-thumbnail m-1';
+                img.style.maxWidth = '150px';
+                img.style.maxHeight = '150px';
+                preview.appendChild(img);
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+});
+</script>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

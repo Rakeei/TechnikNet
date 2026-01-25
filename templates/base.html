@@ -1,0 +1,190 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}" data-bs-theme="auto">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Technik-Net GmbH Property Management{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+    body { padding-top: 70px; }
+    .navbar-brand { font-weight: bold; }
+    .table-hover tbody tr:hover { background-color: rgba(0,123,255,0.1); }
+    .property-image { max-width: 200px; max-height: 150px; object-fit: cover; }
+    .language-flag { font-size: 1.2em; }
+
+    /* Logo styles */
+    .navbar-brand img {
+        transition: transform 0.3s ease;
+    }
+    .navbar-brand:hover img {
+        transform: scale(1.05);
+    }
+
+    /* Login page logo */
+    .login-logo {
+        max-width: 200px;
+        height: auto;
+        margin-bottom: 20px;
+        animation: fadeIn 0.5s ease-in;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container-fluid">
+	    <a class="navbar-brand d-flex align-items-center" href="{% url 'property_list' %}">
+    {% load static %}
+    <img src="{% static 'images/logo.png' %}" alt="Technik-net GmbH" style="height: 40px; margin-right: 10px;">
+    <span>Technik-net GmbH</span>
+</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'property_list' %}">
+                            <i class="bi bi-list-ul"></i> {% trans "Properties" %}
+                        </a>
+                    </li>
+                    {% if user.is_superuser %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'excel_import_export' %}">
+                            <i class="bi bi-file-earmark-excel"></i> {% trans "Import" %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'property_create' %}">
+                            <i class="bi bi-plus-circle"></i> {% trans "Add New" %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/">
+                            <i class="bi bi-gear"></i> {% trans "Admin Panel" %}
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                    <!-- User Menu -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> {{ user.username }}
+                            {% if not user.is_superuser %}
+                            <span class="badge bg-secondary">
+                                {{ user.team_memberships.count }} {% trans "teams" %}
+                            </span>
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            {% if not user.is_superuser %}
+                            <li><h6 class="dropdown-header">{% trans "Your Teams" %}:</h6></li>
+                            {% for ur in user.team_memberships.all %}
+                            <li><span class="dropdown-item-text">🏙️ {{ tm.team.name }}</span></li>
+                            {% empty %}
+                            <li><span class="dropdown-item-text text-muted">{% trans "No Team assigned" %}</span></li>
+                            {% endfor %}
+                            <li><hr class="dropdown-divider"></li>
+                            {% endif %}
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">
+                                <i class="bi bi-box-arrow-right"></i> {% trans "Logout" %}
+                            </a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">
+                            <i class="bi bi-box-arrow-in-right"></i> {% trans "Login" %}
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <!-- Language Switcher -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-translate"></i>
+                            {% if LANGUAGE_CODE == 'de' %}🇩🇪 DE{% else %}🇬🇧 EN{% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <form action="{% url 'set_language' %}" method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="language" value="en">
+                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                    <button type="submit" class="dropdown-item">
+                                        <span class="language-flag">🇬🇧</span> English
+                                    </button>
+                                </form>
+                            </li>
+                            <li>
+                                <form action="{% url 'set_language' %}" method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="language" value="de">
+                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                    <button type="submit" class="dropdown-item">
+                                        <span class="language-flag">🇩🇪</span> Deutsch
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Theme Switcher -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-palette"></i> {% trans "Theme" %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#" onclick="setTheme('light')">☀️ {% trans "Light" %}</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setTheme('dark')">🌙 {% trans "Dark" %}</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setTheme('auto')">🔄 {% trans "Auto" %}</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    <div class="container-fluid mt-3">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Content -->
+    <main class="container-fluid">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'auto';
+        document.documentElement.setAttribute('data-bs-theme', savedTheme);
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
