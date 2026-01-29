@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+
+{% block title %}Bulk Geocode - Technik-net GmbH{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-geo-alt"></i> Bulk Geocode Properties</h2>
+    <a href="{% url 'property_map' %}" class="btn btn-secondary">
+        <i class="bi bi-map"></i> View Map
+    </a>
+</div>
+
+<div class="alert alert-info">
+    <h5><i class="bi bi-info-circle"></i> About Geocoding</h5>
+    <p>This tool will automatically find GPS coordinates (latitude & longitude) for properties based on their addresses.</p>
+    <ul>
+        <li>Uses OpenStreetMap Nominatim service (free, no API key needed)</li>
+        <li>Processes up to 50 properties at a time</li>
+        <li>Rate limited to 1 request per second</li>
+        <li>Only processes properties with complete addresses</li>
+    </ul>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <h5 class="mb-0">Properties Without Coordinates</h5>
+    </div>
+    <div class="card-body">
+        <p><strong>Total properties without coordinates:</strong> {{ total_count }}</p>
+        
+        {% if total_count > 0 %}
+        <form method="post">
+            {% csrf_token %}
+            <p class="text-muted">
+                This will process the first {{ properties|length|default:"50" }} properties. 
+                You can run this multiple times until all properties are geocoded.
+            </p>
+            <button type="submit" class="btn btn-primary" onclick="return confirm('Start geocoding? This may take a few minutes.')">
+                <i class="bi bi-play-circle"></i> Start Geocoding ({{ properties|length|default:"0" }} properties)
+            </button>
+        </form>
+        
+        <hr>
+        
+        <h6>Sample Properties to be Geocoded:</h6>
+        <div class="table-responsive">
+            <table class="table table-sm table-striped">
+                <thead>
+                    <tr>
+                        <th>Number</th>
+                        <th>Address</th>
+                        <th>Village</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for property in properties|slice:":10" %}
+                    <tr>
+                        <td>{{ property.number }}</td>
+                        <td>{{ property.street }} {{ property.house_number }}</td>
+                        <td>{{ property.village }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        {% if total_count > 10 %}
+        <p class="text-muted">... and {{ total_count|add:"-10" }} more</p>
+        {% endif %}
+        
+        {% else %}
+        <div class="alert alert-success">
+            <i class="bi bi-check-circle"></i> All properties have been geocoded!
+        </div>
+        <a href="{% url 'property_map' %}" class="btn btn-success">
+            <i class="bi bi-map"></i> View Map
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

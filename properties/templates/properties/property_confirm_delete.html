@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Property - TechnikNet{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h4 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Confirm Deletion</h4>
+            </div>
+            <div class="card-body">
+                <p>Are you sure you want to delete this property?</p>
+                <ul>
+                    <li><strong>Number:</strong> {{ property.number }}</li>
+                    <li><strong>Village:</strong> {{ property.village }}</li>
+                    <li><strong>Owner:</strong> {{ property.owner_name }} {{ property.owner_surname }}</li>
+                </ul>
+                <p class="text-danger"><strong>This action cannot be undone!</strong></p>
+
+                <form method="post" class="d-flex gap-2">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Yes, Delete
+                    </button>
+                    <a href="{% url 'property_detail' property.pk %}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block title %}Upload Images - {{ property.number }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">
+                    <i class="bi bi-camera"></i> Upload Images for Property {{ property.number }}
+                </h4>
+            </div>
+            <div class="card-body">
+                <!-- Upload Method Selection -->
+                <div class="mb-4">
+                    <h6 class="mb-3">Choose Upload Method:</h6>
+                    <div class="d-grid gap-2">
+                        <!-- Camera Button -->
+                        <button type="button" 
+                                class="btn btn-lg btn-outline-primary" 
+                                onclick="document.getElementById('cameraInput').click()">
+                            <i class="bi bi-camera-fill"></i> Take Photo with Camera
+                        </button>
+                        
+                        <!-- Gallery Button -->
+                        <button type="button" 
+                                class="btn btn-lg btn-outline-success" 
+                                onclick="document.getElementById('galleryInput').click()">
+                            <i class="bi bi-images"></i> Choose from Gallery/Files
+                        </button>
+                    </div>
+                </div>
+
+                <form method="post" enctype="multipart/form-data" id="uploadForm">
+                    {% csrf_token %}
+                    
+                    <!-- Hidden Camera Input -->
+                    <input type="file" 
+                           id="cameraInput" 
+                           name="images" 
+                           accept="image/*" 
+                           capture="environment"
+                           multiple
+                           style="display: none;"
+                           onchange="handleFileSelect(this)">
+                    
+                    <!-- Hidden Gallery Input -->
+                    <input type="file" 
+                           id="galleryInput" 
+                           name="images" 
+                           accept="image/*" 
+                           multiple
+                           style="display: none;"
+                           onchange="handleFileSelect(this)">
+
+                    <!-- Preview Area -->
+                    <div id="imagePreview" class="d-none">
+                        <hr>
+                        <label class="form-label">
+                            <i class="bi bi-eye"></i> Selected Images (<span id="imageCount">0</span>)
+                        </label>
+                        <div id="previewContainer" class="row g-2 mb-3"></div>
+                        
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-upload"></i> Upload Images
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="resetSelection()">
+                                <i class="bi bi-arrow-counterclockwise"></i> Choose Different Images
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Cancel Link -->
+                <div class="mt-3 text-center">
+                    <a href="{% url 'property_detail' property.pk %}" class="btn btn-link">
+                        <i class="bi bi-x-circle"></i> Cancel
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function handleFileSelect(input) {
+    const previewArea = document.getElementById('imagePreview');
+    const previewContainer = document.getElementById('previewContainer');
+    const imageCount = document.getElementById('imageCount');
+    const files = input.files;
+    
+    previewContainer.innerHTML = '';
+    
+    if (files.length > 0) {
+        previewArea.classList.remove('d-none');
+        imageCount.textContent = files.length;
+        
+        Array.from(files).forEach(file => {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const col = document.createElement('div');
+                    col.className = 'col-6 col-md-4 col-lg-3';
+                    
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'img-fluid rounded border';
+                    img.style.height = '150px';
+                    img.style.objectFit = 'cover';
+                    
+                    col.appendChild(img);
+                    previewContainer.appendChild(col);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+        
+        // Sync the other input
+        const otherId = input.id === 'cameraInput' ? 'galleryInput' : 'cameraInput';
+        const otherInput = document.getElementById(otherId);
+        const dt = new DataTransfer();
+        Array.from(files).forEach(file => dt.items.add(file));
+        otherInput.files = dt.files;
+    }
+}
+
+function resetSelection() {
+    document.getElementById('cameraInput').value = '';
+    document.getElementById('galleryInput').value = '';
+    document.getElementById('imagePreview').classList.add('d-none');
+}
+</script>
+{% endblock %}
+

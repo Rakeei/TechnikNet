@@ -1,0 +1,24 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<h1>{{ title }}</h1>
+
+<p>You are about to change the status for the following {{ properties|length }} properties:</p>
+
+<ul>
+    {% for property in properties %}
+    <li>{{ property.number }} - {{ property.village }}</li>
+    {% endfor %}
+</ul>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="hidden" name="action" value="bulk_change_status">
+    {% for obj in properties %}
+    <input type="hidden" name="_selected_action" value="{{ obj.pk }}">
+    {% endfor %}
+    <button type="submit" name="apply" class="button">Apply Changes</button>
+    <a href="{% url 'admin:properties_property_changelist' %}" class="button cancel-link">Cancel</a>
+</form>
+{% endblock %}
