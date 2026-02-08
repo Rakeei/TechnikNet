@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Properties - TechnikNet{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-building"></i> Properties</h2>
+    <div>
+        <a href="{% url 'property_completed' %}" class="btn btn-success me-2">
+            <i class="bi bi-check-circle"></i> Completed
+        </a>
+        {% if user.is_superuser %}
+        <a href="{% url 'property_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add New Property
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3">
+            <div class="col-md-5">
+                <input type="text" name="search" class="form-control" placeholder="Search..." value="{{ search }}">
+            </div>
+            <div class="col-md-3">
+                <select name="team" class="form-select">
+                    <option value="">All Teams</option>
+                    {% for team in teams %}
+                    <option value="{{ team.id }}" {% if team.id|stringformat:"s" == team_filter %}selected{% endif %}>
+                        {{ team.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+		    <option value="klarungen" {% if status_filter == 'klarungen' %}selected{% endif %}>Klarungen</option>
+		    <option value="auskundung" {% if status_filter == 'auskundung' %}selected{% endif %}>Auskundung terminiert</option>
+		    <option value="zustimmung_eigentuemer" {% if status_filter == 'zustimmung_eigentuemer' %}selected{% endif %}>Zustimmung des Eigentümers</option>
+		    <option value="bereit_zur_umsetzung" {% if status_filter == 'bereit_zur_umsetzung' %}selected{% endif %}>Bereit zur Umsetzung</option>
+		    <option value="ausbau_terminiert" {% if status_filter == 'ausbau_terminiert' %}selected{% endif %}>Ausbau terminiert</option>
+		    <option value="storniert" {% if status_filter == 'storniert' %}selected{% endif %}>Storniert</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-secondary w-100">
+                    <i class="bi bi-search"></i> Filter
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <span class="text-muted">Total: {{ properties.paginator.count }} properties</span>
+    </div>
+    <div>
+        <a href="{% url 'excel_export' %}?search={{ search }}&team={{ team_filter }}&status={{ status_filter }}" 
+           class="btn btn-success">
+            <i class="bi bi-file-earmark-excel"></i> Export to Excel
+        </a>
+    </div>
+</div>
+<!-- Table -->
+<div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+		<th>#</th>
+                <th>Address ID</th>
+                <th>Address</th>
+                <th>House</th>
+                <th>ZUS</th>
+		<th>Owner</th>
+                <th>Teams</th>
+                <th>Status</th>
+                <th>HBG Termin</th>
+                <th>Ausbau Termin</th>
+                <th>Images</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for property in properties %}
+            <tr>
+		<td>{{ forloop.counter }}</td>
+                <td><a href="{% url 'property_detail' property.pk %}">{{ property.address_id }}</a></td>
+                <td>{{ property.village }}</td>
+                <td>{{ property.street }}</td>
+                <td>{{ property.house_number }}</td>
+                <td>{{ property.house_number_affix|default:"-" }}</td>
+		<td>{{ property.owner_surname|default:"-" }}</td>
+                <td>
+                    {% for team in property.teams.all %}
+                        <span class="badge bg-info">{{ team.name }}</span>
+                    {% empty %}
+                        <span class="text-muted">-</span>
+                    {% endfor %}
+                </td>
+                <td>
+                    {% if property.status %}
+                    <span class="badge
+			{% if property.status == 'klarungen' %}bg-warning text-dark
+                        {% elif property.status == 'auskundung' %}bg-warning
+                        {% elif property.status == 'zustimmung_eigentuemer' %}bg-primary
+                        {% elif property.status == 'bereit_zur_umsetzung' %}bg-info
+                        {% elif property.status == 'ausbau_terminiert' %}bg-primary
+                        {% elif property.status == 'ausbau_abgeschlossen' %}bg-success
+                        {% elif property.status == 'bezahlt' %}bg-dark
+			{% elif property.status == 'storniert' %}bg-danger
+			{% else %}bg-secondary
+			{% endif %}">
+			{{ property.get_status_display }}
+                    </span>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if property.hbg_termin %}
+                        <small>{{ property.hbg_termin|date:"Y-m-d H:i" }}</small>
+                        {% if property.hbg == 'Ja' %}<span class="badge bg-success">HBG: Ja</span>{% endif %}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    {% if property.ausbau_termin %}
+                        <small>{{ property.ausbau_termin|date:"Y-m-d H:i" }}</small>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>
+                    <span class="badge bg-secondary">
+                        <i class="bi bi-images"></i> {{ property.images.count }}
+                    </span>
+                </td>
+                <td>
+                    <a href="{% url 'property_detail' property.pk %}" class="btn btn-sm btn-info" title="View">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                    <a href="{% url 'property_user_edit' property.pk %}" class="btn btn-sm btn-warning" title="Edit">
+                        <i class="bi bi-pencil"></i>
+                    </a>
+                    <a href="{% url 'property_upload_image' property.pk %}" class="btn btn-sm btn-success" title="Upload Images">
+                        <i class="bi bi-camera"></i>
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="10" class="text-center text-muted">No properties found</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination -->
+{% if properties.has_other_pages %}
+<nav>
+    <ul class="pagination justify-content-center">
+        {% if properties.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ properties.previous_page_number }}&search={{ search }}&team={{ team_filter }}&status={{ status_filter }}">Previous</a>
+        </li>
+        {% endif %}
+
+        <li class="page-item active">
+            <span class="page-link">Page {{ properties.number }} of {{ properties.paginator.num_pages }}</span>
+        </li>
+
+        {% if properties.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ properties.next_page_number }}&search={{ search }}&team={{ team_filter }}&status={{ status_filter }}">Next</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

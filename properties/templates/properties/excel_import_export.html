@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}Excel Import - TechnikNet{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h2><i class="bi bi-file-earmark-excel"></i> Excel Import</h2>
+        <p class="text-muted">Import properties from Excel or export filtered data</p>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <!-- Import Section -->
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-upload"></i> Import from Excel</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'excel_import' %}" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="excel_file" class="form-label">Select Excel File</label>
+                        <input type="file" name="excel_file" id="excel_file" class="form-control" accept=".xlsx,.xls" required>
+                        <small class="text-muted">Upload .xlsx or .xls file with the standard format</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="default_team" class="form-label">Default Team (Optional)</label>
+                        <select name="default_team" id="default_team" class="form-select">
+                            <option value="">-- No default team --</option>
+                            {% for team in teams %}
+                            <option value="{{ team.id }}">{{ team.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <small class="text-muted">Assign new properties to this team automatically</small>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" name="force_replace" id="force_replace">
+                        <label class="form-check-label" for="force_replace">
+                            <strong>Force Replace</strong> - Update existing properties
+                        </label>
+                        <small class="d-block text-muted">
+                            ⚠️ If checked, existing properties will be updated with new data.
+                            If unchecked, existing properties will be skipped (merge only).
+                        </small>
+                    </div>
+
+                    <div class="alert alert-info">
+                        <strong>ℹ️ How it works:</strong>
+                        <ul class="mb-0">
+                            <li><strong>Merge (default):</strong> New properties will be added, existing ones will be kept unchanged</li>
+                            <li><strong>Force Replace:</strong> Both new and existing properties will be updated</li>
+                        </ul>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-upload"></i> Import Excel File
+                    </button>
+                </form>
+
+                <div class="mt-3">
+                    <p class="mb-1"><strong>Current Database:</strong></p>
+                    <span class="badge bg-secondary">{{ total_properties }} properties</span>
+                </div>
+            </div>
+        </div>
+    </div>
+<div class="row mt-4">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="bi bi-file-earmark-spreadsheet"></i> Excel Template</h5>
+            </div>
+            <div class="card-body">
+                <p>Download the standard Excel template for importing:</p>
+                <a href="{% url 'excel_export' %}" class="btn btn-info">
+                    <i class="bi bi-download"></i> Download Template
+                </a>
+                <small class="text-muted d-block mt-2">
+                    This will export all current properties. You can modify and re-import this file.
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+        <!-- Required Columns Info -->
+        <div class="alert alert-warning mb-3">
+            <h6><i class="bi bi-list-check"></i> Required Columns:</h6>
+            <ul class="mb-0">
+                <li><strong>Number</strong> - Property number (required, must be unique)</li>
+                <li><strong>Team</strong> - Team name(s), comma-separated (optional, e.g., "Team A, Team B")</li>
+            </ul>
+            <hr>
+            <small class="text-muted">
+                📌 <strong>Note:</strong> Column order doesn't matter - the system reads by column name.<br>
+                📌 All other columns are optional and will use default values if empty.
+            </small>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label for="excel_file" class="form-label">Select Excel File (.xlsx or .xls)</label>
+                <input type="file" name="excel_file" id="excel_file" class="form-control" accept=".xlsx,.xls" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="default_team" class="form-label">Default Team (optional)</label>
+                <select name="default_team" id="default_team" class="form-select">
+                    <option value="">-- No Default Team --</option>
+                    {% for team in teams %}
+                    <option value="{{ team.id }}">{{ team.name }}</option>
+                    {% endfor %}
+                </select>
+                <small class="text-muted">
+                    This team will be assigned to new properties that don't have a Team column value
+                </small>
+            </div>
+
+            <div class="form-check mb-3">
+                <input type="checkbox" name="force_replace" id="force_replace" class="form-check-input">
+                <label for="force_replace" class="form-check-label">
+                    <strong>Force Replace Existing Properties</strong>
+                    <br>
+                    <small class="text-muted">
+                        If checked: Updates existing properties with matching Number<br>
+                        If unchecked: Skips existing properties (only creates new ones)
+                    </small>
+                </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-upload"></i> Import Excel File
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+

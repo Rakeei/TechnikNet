@@ -1,0 +1,405 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE }}" data-bs-theme="auto">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Technik-Net GmbH Property Management{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+    :root {
+        /* German Flag Colors */
+        --german-black: #000000;
+        --german-red: #DD0000;
+        --german-gold: #FFCE00;
+        
+        /* Theme Colors */
+        --primary-color: var(--german-black);
+        --secondary-color: var(--german-red);
+        --accent-color: var(--german-gold);
+        --text-light: #ffffff;
+        --bg-light: #f8f9fa;
+    }
+    
+    body { 
+        padding-top: 70px; 
+        background-color: var(--bg-light);
+    }
+    
+    /* Navbar - German Black */
+    .navbar {
+        background: linear-gradient(135deg, var(--german-black) 0%, #1a1a1a 100%) !important;
+        border-bottom: 3px solid var(--german-red);
+    }
+    
+    .navbar-brand { 
+        font-weight: bold;
+        color: var(--text-light) !important;
+    }
+    
+    .navbar-brand:hover {
+        color: var(--german-gold) !important;
+    }
+    
+    .nav-link {
+        color: rgba(255, 255, 255, 0.9) !important;
+        transition: all 0.3s;
+    }
+    
+    .nav-link:hover {
+        color: var(--german-gold) !important;
+        transform: translateY(-2px);
+    }
+    
+    /* Buttons */
+    .btn-primary {
+        background: linear-gradient(135deg, var(--german-black) 0%, #2a2a2a 100%);
+        border: 2px solid var(--german-red);
+        color: var(--text-light);
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+    
+    .btn-primary:hover {
+        background: linear-gradient(135deg, var(--german-red) 0%, #bb0000 100%);
+        border-color: var(--german-gold);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(221, 0, 0, 0.3);
+    }
+    
+    .btn-success {
+        background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%);
+        border: 2px solid var(--german-gold);
+    }
+    
+    .btn-warning {
+        background: var(--german-gold);
+        border: 2px solid var(--german-black);
+        color: var(--german-black);
+        font-weight: 600;
+    }
+    
+    .btn-warning:hover {
+        background: #e6b800;
+        color: var(--german-black);
+    }
+    
+    .btn-danger {
+        background: linear-gradient(135deg, var(--german-red) 0%, #aa0000 100%);
+        border: 2px solid var(--german-black);
+    }
+    
+    /* Cards */
+    .card {
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s;
+    }
+    
+    .card:hover {
+        box-shadow: 0 4px 16px rgba(221, 0, 0, 0.2);
+        border-color: var(--german-red);
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, var(--german-black) 0%, #2a2a2a 100%);
+        color: var(--text-light);
+        border-bottom: 3px solid var(--german-red);
+        font-weight: 600;
+    }
+    
+    /* Table */
+    .table-hover tbody tr:hover { 
+        background: linear-gradient(90deg, rgba(255, 206, 0, 0.1) 0%, rgba(221, 0, 0, 0.05) 100%);
+        cursor: pointer;
+    }
+    
+    .table-dark {
+        background: linear-gradient(135deg, var(--german-black) 0%, #1a1a1a 100%);
+        color: var(--text-light);
+    }
+    
+    .table-dark th {
+        border-bottom: 2px solid var(--german-red);
+    }
+    
+    /* Badges */
+    .badge {
+        font-weight: 600;
+        padding: 6px 12px;
+    }
+    
+    .bg-primary {
+        background: var(--german-black) !important;
+    }
+    
+    .bg-warning {
+        background: var(--german-gold) !important;
+        color: var(--german-black) !important;
+    }
+    
+    .bg-danger {
+        background: var(--german-red) !important;
+    }
+    
+    /* Alerts */
+    .alert-success {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        border-left: 4px solid #28a745;
+    }
+    
+    .alert-warning {
+        background: linear-gradient(135deg, var(--german-gold) 0%, #f0c000 100%);
+        border-left: 4px solid var(--german-black);
+        color: var(--german-black);
+    }
+    
+    .alert-danger {
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        border-left: 4px solid var(--german-red);
+    }
+    
+    .alert-info {
+        background: linear-gradient(135deg, #d1ecf1 0%, #bee5eb 100%);
+        border-left: 4px solid #17a2b8;
+    }
+    
+    /* Forms */
+    .form-control:focus {
+        border-color: var(--german-red);
+        box-shadow: 0 0 0 0.2rem rgba(221, 0, 0, 0.25);
+    }
+    
+    .form-select:focus {
+        border-color: var(--german-gold);
+        box-shadow: 0 0 0 0.2rem rgba(255, 206, 0, 0.25);
+    }
+    
+    /* Property Images */
+    .property-image { 
+        max-width: 200px; 
+        max-height: 150px; 
+        object-fit: cover;
+        border: 2px solid var(--german-gold);
+        border-radius: 4px;
+    }
+    
+    /* Language Flag */
+    .language-flag { 
+        font-size: 1.2em; 
+    }
+    
+    /* Logo styles */
+    .navbar-brand img {
+        transition: transform 0.3s ease;
+        filter: drop-shadow(0 0 5px rgba(255, 206, 0, 0.3));
+    }
+    
+    .navbar-brand:hover img {
+        transform: scale(1.05);
+        filter: drop-shadow(0 0 10px rgba(255, 206, 0, 0.5));
+    }
+    
+    /* Login page */
+    .login-logo {
+        max-width: 200px;
+        height: auto;
+        margin-bottom: 20px;
+        animation: fadeIn 0.5s ease-in;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* Pagination */
+    .pagination .page-link {
+        color: var(--german-black);
+        border-color: var(--german-gold);
+    }
+    
+    .pagination .page-link:hover {
+        background-color: var(--german-gold);
+        border-color: var(--german-black);
+        color: var(--german-black);
+    }
+    
+    .pagination .page-item.active .page-link {
+        background-color: var(--german-red);
+        border-color: var(--german-red);
+    }
+    
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+        width: 10px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, var(--german-black) 0%, var(--german-red) 50%, var(--german-gold) 100%);
+        border-radius: 5px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(180deg, var(--german-red) 0%, var(--german-black) 100%);
+    }
+</style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
+        <div class="container-fluid">
+	    <a class="navbar-brand d-flex align-items-center" href="{% url 'property_list' %}">
+    {% load static %}
+    <img src="{% static 'images/logo.png' %}" alt="Technik-net GmbH" style="height: 40px; margin-right: 10px;">
+    <span>Technik-net GmbH</span>
+</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    {% if user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'property_list' %}">
+                            <i class="bi bi-list-ul"></i> {% trans "Properties" %}
+                        </a>
+                    </li>
+                    {% if user.is_superuser %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'excel_import_export' %}">
+                            <i class="bi bi-file-earmark-excel"></i> {% trans "Import" %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'property_create' %}">
+                            <i class="bi bi-plus-circle"></i> {% trans "Add New" %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/admin/">
+                            <i class="bi bi-gear"></i> {% trans "Admin Panel" %}
+                        </a>
+                    </li>
+                    {% endif %}
+                    {% endif %}
+                </ul>
+                <ul class="navbar-nav">
+                    {% if user.is_authenticated %}
+                    <!-- User Menu -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-person-circle"></i> {{ user.username }}
+                            {% if not user.is_superuser %}
+                            <span class="badge bg-secondary">
+                                {{ user.team_memberships.count }} {% trans "teams" %}
+                            </span>
+                            {% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            {% if not user.is_superuser %}
+                            <li><h6 class="dropdown-header">{% trans "Your Teams" %}:</h6></li>
+                            {% for ur in user.team_memberships.all %}
+                            <li><span class="dropdown-item-text">🏙️ {{ tm.team.name }}</span></li>
+                            {% empty %}
+                            <li><span class="dropdown-item-text text-muted">{% trans "No Team assigned" %}</span></li>
+                            {% endfor %}
+                            <li><hr class="dropdown-divider"></li>
+                            {% endif %}
+                            <li><a class="dropdown-item" href="{% url 'logout' %}">
+                                <i class="bi bi-box-arrow-right"></i> {% trans "Logout" %}
+                            </a></li>
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'login' %}">
+                            <i class="bi bi-box-arrow-in-right"></i> {% trans "Login" %}
+                        </a>
+                    </li>
+                    {% endif %}
+
+                    <!-- Language Switcher -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-translate"></i>
+                            {% if LANGUAGE_CODE == 'de' %}🇩🇪 DE{% else %}🇬🇧 EN{% endif %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <form action="{% url 'set_language' %}" method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="language" value="en">
+                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                    <button type="submit" class="dropdown-item">
+                                        <span class="language-flag">🇬🇧</span> English
+                                    </button>
+                                </form>
+                            </li>
+                            <li>
+                                <form action="{% url 'set_language' %}" method="post" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="language" value="de">
+                                    <input type="hidden" name="next" value="{{ request.path }}">
+                                    <button type="submit" class="dropdown-item">
+                                        <span class="language-flag">🇩🇪</span> Deutsch
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <!-- Theme Switcher -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-palette"></i> {% trans "Theme" %}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="#" onclick="setTheme('light')">☀️ {% trans "Light" %}</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setTheme('dark')">🌙 {% trans "Dark" %}</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="setTheme('auto')">🔄 {% trans "Auto" %}</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    <div class="container-fluid mt-3">
+        {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Content -->
+    <main class="container-fluid">
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            localStorage.setItem('theme', theme);
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'auto';
+        document.documentElement.setAttribute('data-bs-theme', savedTheme);
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

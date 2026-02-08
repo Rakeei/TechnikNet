@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Property Map - Technik-net GmbH{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    #map {
+        height: calc(100vh - 150px);
+        width: 100%;
+        border: 3px solid var(--german-red);
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    
+    .map-controls {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 1000;
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        border: 2px solid var(--german-gold);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .leaflet-popup-content-wrapper {
+        border: 2px solid var(--german-red);
+        border-radius: 8px;
+    }
+    
+    .property-popup {
+        min-width: 200px;
+    }
+    
+    .property-popup h6 {
+        color: var(--german-black);
+        border-bottom: 2px solid var(--german-gold);
+        padding-bottom: 5px;
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2><i class="bi bi-map"></i> Property Map</h2>
+    <div>
+        <a href="{% url 'property_list' %}" class="btn btn-secondary">
+            <i class="bi bi-list-ul"></i> Back to List
+        </a>
+        {% if user.is_superuser %}
+        <a href="{% url 'bulk_geocode' %}" class="btn btn-warning">
+            <i class="bi bi-geo-alt"></i> Bulk Geocode
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4">
+                <strong>Total Properties:</strong> {{ total_properties }}
+            </div>
+            <div class="col-md-4">
+                <strong>With Coordinates:</strong> {{ properties_with_coords }}
+            </div>
+            <div class="col-md-4">
+                <strong>Missing Coordinates:</strong> {{ total_properties|add:"-"|add:properties_with_coords }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="map"></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // Initialize map centered on Germany
+    const map = L.map('map').setView([51.1657, 10.4515], 6);
+    
+    // Add OpenStreetMap tiles
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 19
+    }).addTo(map);
+    
+    // Properties data from Django
+    const properties = {{ properties|safe }};
+    
+    // German flag colors for markers
+const getMarkerColor = (status) => {
+    const colors = {
+        'klarungen': '#FFCE00',                  // Gold
+        'auskundung': '#FF9500',                 // Orange
+        'zustimmung_eigentuemer': '#0066CC',     // Blue
+        'bereit_zur_umsetzung': '#17a2b8',       // Cyan/Info
+        'ausbau_terminiert': '#0066CC',          // Blue
+        'ausbau_abgeschlossen': '#00AA00',       // Green
+        'bezahlt': '#000000',                    // Black
+        'storniert': '#DC3545',                  // Red
+    };
+    return colors[status] || '#DD0000';
+};
+    // Add markers for each property
+    const markers = L.markerClusterGroup();
+    
+    properties.forEach(property => {
+        const marker = L.marker([property.latitude, property.longitude], {
+            icon: L.divIcon({
+                className: 'custom-marker',
+                html: `<div style="background-color: ${getMarkerColor(property.status)}; width: 25px; height: 25px; border-radius: 50%; border: 3px solid #000; box-shadow: 0 2px 5px rgba(0,0,0,0.3);"></div>`,
+                iconSize: [25, 25]
+            })
+        });
+        
+        const popupContent = `
+            <div class="property-popup">
+                <h6><strong>${property.number}</strong></h6>
+                <p class="mb-1"><strong>Address:</strong><br>${property.address}</p>
+                <p class="mb-1"><strong>Status:</strong> <span class="badge bg-secondary">${property.status}</span></p>
+                <p class="mb-1"><strong>Teams:</strong> ${property.teams || 'None'}</p>
+                <hr>
+                <div class="d-grid gap-2">
+                    <a href="/properties/${property.id}/" class="btn btn-sm btn-primary">
+                        <i class="bi bi-eye"></i> View Details
+                    </a>
+                    <a href="https://www.google.com/maps/dir/?api=1&destination=${property.latitude},${property.longitude}" 
+                       target="_blank" class="btn btn-sm btn-success">
+                        <i class="bi bi-geo-alt"></i> Get Directions
+                    </a>
+                </div>
+            </div>
+        `;
+        
+        marker.bindPopup(popupContent);
+        markers.addLayer(marker);
+    });
+    
+    map.addLayer(markers);
+    
+    // Fit map to show all markers
+    if (properties.length > 0) {
+        const group = new L.featureGroup(markers.getLayers());
+        map.fitBounds(group.getBounds().pad(0.1));
+    }
+</script>
+{% endblock %}

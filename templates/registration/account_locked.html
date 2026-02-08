@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Account Locked - Technik-net GmbH{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6">
+        <div class="card shadow border-danger">
+            <div class="card-body p-5 text-center">
+                <div class="text-center mb-4">
+                    <img src="{% static 'images/logo.png' %}" alt="Technik-net GmbH" style="max-width: 150px; height: auto; margin-bottom: 20px;">
+                </div>
+                
+                <i class="bi bi-shield-lock text-danger" style="font-size: 4rem;"></i>
+                <h2 class="text-danger mt-3">Account Locked</h2>
+                <p class="lead mt-3">Too many failed login attempts.</p>
+                <p>Your account has been temporarily locked for security reasons.</p>
+                <p class="text-muted">Please try again in 1 hour, or contact your administrator.</p>
+                
+                <a href="{% url 'login' %}" class="btn btn-primary mt-4">
+                    <i class="bi bi-arrow-left"></i> Back to Login
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

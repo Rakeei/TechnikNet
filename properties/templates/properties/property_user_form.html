@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+
+{% block title %}Edit User Fields - Technik-net GmbH{% endblock %}
+
+{% block content %}
+<h2><i class="bi bi-pencil"></i> Edit User Fields</h2>
+
+<form method="post" enctype="multipart/form-data" class="mt-4">
+    {% csrf_token %}
+
+    <div class="card mb-3">
+        <div class="card-header bg-warning">
+            <h5 class="mb-0">User Fields</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <!-- Gebaute Units -->
+                <div class="col-md-4 mb-3">
+                    <label for="gebaute_units" class="form-label">Gebaute Units</label>
+                    <input type="number" name="gebaute_units" id="gebaute_units" class="form-control" 
+                           value="{{ property.gebaute_units|default:'' }}">
+                </div>
+
+                <!-- HBG -->
+                <div class="col-md-4 mb-3">
+                    <label for="hbg" class="form-label">HBG</label>
+                    <select name="hbg" id="hbg" class="form-select">
+                        <option value="">---------</option>
+                        <option value="Ja" {% if property.hbg == 'Ja' %}selected{% endif %}>Ja</option>
+                        <option value="Nein" {% if property.hbg == 'Nein' %}selected{% endif %}>Nein</option>
+                    </select>
+                </div>
+
+                <!-- HBG Termin -->
+                <div class="col-md-4 mb-3">
+                    <label for="hbg_termin" class="form-label">HBG Termin</label>
+                    <input type="datetime-local" name="hbg_termin" id="hbg_termin" class="form-control"
+                           value="{% if property.hbg_termin %}{{ property.hbg_termin|date:'Y-m-d' }}T{{ property.hbg_termin|date:'H:i' }}{% endif %}">
+                    <small class="text-muted">Select date and time</small>
+                </div>
+
+                <!-- Ausbau Termin -->
+                <div class="col-md-4 mb-3">
+                    <label for="ausbau_termin" class="form-label">Ausbau Termin</label>
+                    <input type="datetime-local" name="ausbau_termin" id="ausbau_termin" class="form-control"
+                           value="{% if property.ausbau_termin %}{{ property.ausbau_termin|date:'Y-m-d' }}T{{ property.ausbau_termin|date:'H:i' }}{% endif %}">
+                    <small class="text-muted">Select date and time</small>
+                </div>
+
+                <!-- K.L 15M -->
+                <div class="col-md-4 mb-3">
+                    <label for="kl_15m" class="form-label">K.L 15M</label>
+                    <input type="number" name="kl_15m" id="kl_15m" class="form-control" 
+                           value="{{ property.kl_15m|default:0 }}" min="0" max="50">
+                    <small class="text-muted">Enter value (0-50)</small>
+                </div>
+                
+                <!-- K.L 20M -->
+                <div class="col-md-4 mb-3">
+                    <label for="kl_20m" class="form-label">K.L 20M</label>
+                    <input type="number" name="kl_20m" id="kl_20m" class="form-control" 
+                           value="{{ property.kl_20m|default:0 }}" min="0" max="50">
+                    <small class="text-muted">Enter value (0-50)</small>
+                </div>
+                
+                <!-- K.L 30M -->
+                <div class="col-md-4 mb-3">
+                    <label for="kl_30m" class="form-label">K.L 30M</label>
+                    <input type="number" name="kl_30m" id="kl_30m" class="form-control" 
+                           value="{{ property.kl_30m|default:0 }}" min="0" max="50">
+                    <small class="text-muted">Enter value (0-50)</small>
+                </div>
+                
+                <!-- K.L 50M -->
+                <div class="col-md-4 mb-3">
+                    <label for="kl_50m" class="form-label">K.L 50M</label>
+                    <input type="number" name="kl_50m" id="kl_50m" class="form-control" 
+                           value="{{ property.kl_50m|default:0 }}" min="0" max="50">
+                    <small class="text-muted">Enter value (0-50)</small>
+                </div>
+                
+                <!-- K.L 80M -->
+                <div class="col-md-4 mb-3">
+                    <label for="kl_80m" class="form-label">K.L 80M</label>
+                    <input type="number" name="kl_80m" id="kl_80m" class="form-control" 
+                           value="{{ property.kl_80m|default:0 }}" min="0" max="50">
+                    <small class="text-muted">Enter value (0-50)</small>
+                </div>
+                
+                <!-- K.L 100M -->
+                <div class="col-md-4 mb-3">
+                    <label for="kl_100m" class="form-label">K.L 100M</label>
+                    <input type="number" name="kl_100m" id="kl_100m" class="form-control" 
+                           value="{{ property.kl_100m|default:0 }}" min="0" max="50">
+                    <small class="text-muted">Enter value (0-50)</small>
+                </div>
+
+                <!-- Keller -->
+                <div class="col-md-4 mb-3">
+                    <label for="keller" class="form-label">Keller</label>
+                    <select name="keller" id="keller" class="form-select">
+                        <option value="">---------</option>
+                        <option value="Ja" {% if property.keller == 'Ja' %}selected{% endif %}>Ja</option>
+                        <option value="Nein" {% if property.keller == 'Nein' %}selected{% endif %}>Nein</option>
+                    </select>
+                </div>
+
+                <!-- HÜP -->
+                <div class="col-md-4 mb-3">
+                    <label for="huep" class="form-label">HÜP</label>
+                    <select name="huep" id="huep" class="form-select">
+                        <option value="">---------</option>
+                        <option value="Ja" {% if property.huep == 'Ja' %}selected{% endif %}>Ja</option>
+                        <option value="Nein" {% if property.huep == 'Nein' %}selected{% endif %}>Nein</option>
+                    </select>
+                </div>
+
+                <!-- Spleissen -->
+                <div class="col-md-4 mb-3">
+                    <label for="spleissen" class="form-label">Spleissen</label>
+                    <select name="spleissen" id="spleissen" class="form-select">
+                        <option value="">---------</option>
+                        <option value="Ja" {% if property.spleissen == 'Ja' %}selected{% endif %}>Ja</option>
+                        <option value="Nein" {% if property.spleissen == 'Nein' %}selected{% endif %}>Nein</option>
+                    </select>
+                </div>
+
+                <!-- Ohne Infra -->
+                <div class="col-md-6 mb-3">
+                    <label for="ohne_infra" class="form-label">Ohne Infra</label>
+                    <input type="number" name="ohne_infra" id="ohne_infra" class="form-control" 
+                           value="{{ property.ohne_infra|default:0 }}" min="0">
+                    <small class="text-muted">Enter a positive number (default: 0)</small>
+                </div>
+
+                <!-- Mit Infra -->
+                <div class="col-md-6 mb-3">
+                    <label for="mit_infra" class="form-label">Mit Infra</label>
+                    <input type="number" name="mit_infra" id="mit_infra" class="form-control" 
+                           value="{{ property.mit_infra|default:0 }}" min="0">
+                    <small class="text-muted">Enter a positive number (default: 0)</small>
+                </div>
+
+                <!-- Status -->
+                <div class="col-md-12 mb-3">
+                    <label for="status" class="form-label">Status</label>
+					<select name="status" id="status" class="form-select">
+                        <option value="">---------</option>
+                        <option value="klarungen" {% if property.status == 'klarungen' %}selected{% endif %}>
+                            Klarungen
+                        </option>
+                        <option value="auskundung" {% if property.status == 'auskundung' %}selected{% endif %}>
+                            Auskundung terminiert
+                        </option>
+                        <option value="zustimmung_eigentuemer" {% if property.status == 'zustimmung_eigentuemer' %}selected{% endif %}>
+                            Zustimmung des Eigentümers
+                        </option>
+                        <option value="bereit_zur_umsetzung" {% if property.status == 'bereit_zur_umsetzung' %}selected{% endif %}>
+                            Bereit zur Umsetzung
+                        </option>
+                        <option value="ausbau_terminiert" {% if property.status == 'ausbau_terminiert' %}selected{% endif %}>
+                            Ausbau terminiert
+                        </option>
+                        <option value="ausbau_abgeschlossen" {% if property.status == 'ausbau_abgeschlossen' %}selected{% endif %}>
+                            Ausbau Abgeschlossen
+                        </option>
+                        {% if user.is_superuser %}
+                        <option value="bezahlt" {% if property.status == 'bezahlt' %}selected{% endif %}>
+                            Bezahlt (Admin Only)
+                        </option>
+                        {% endif %}
+                        <option value="storniert" {% if property.status == 'storniert' %}selected{% endif %}>
+                            Storniert
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Comments -->
+                <div class="col-md-12 mb-3">
+                    <label for="comments" class="form-label">Comments / Notes</label>
+                    <textarea name="comments" id="comments" class="form-control" rows="4" 
+                              placeholder="Add any notes or comments here...">{{ property.comments }}</textarea>
+                    <small class="text-muted">You can add any additional information or notes about this property</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Images Section -->
+    <div class="card mb-3">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="bi bi-images"></i> Upload Images</h5>
+        </div>
+        <div class="card-body">
+            <input type="file" name="images" id="upload_images" class="form-control mb-2" 
+                   multiple accept="image/*" capture="environment">
+            <small class="form-text text-muted">
+                📸 On mobile: use camera | 🖼️ On desktop: select files (Ctrl+Click for multiple)
+            </small>
+
+            <!-- Preview area -->
+            <div id="image_preview" class="mt-3"></div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex gap-2 mb-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-check-circle"></i> Save
+        </button>
+        <a href="{% url 'property_detail' property.pk %}" class="btn btn-secondary">
+            <i class="bi bi-x-circle"></i> Cancel
+        </a>
+    </div>
+</form>
+
+<script>
+document.getElementById('upload_images').addEventListener('change', function(e) {
+    const preview = document.getElementById('image_preview');
+    preview.innerHTML = '';
+
+    if (e.target.files.length > 0) {
+        const title = document.createElement('h6');
+        title.textContent = `${e.target.files.length} image(s) selected:`;
+        preview.appendChild(title);
+
+        const container = document.createElement('div');
+        container.className = 'd-flex flex-wrap gap-2';
+
+        Array.from(e.target.files).forEach(file => {
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.className = 'img-thumbnail';
+                    img.style.maxWidth = '150px';
+                    img.style.maxHeight = '150px';
+                    container.appendChild(img);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        preview.appendChild(container);
+    }
+});
+</script>
+{% endblock %}
